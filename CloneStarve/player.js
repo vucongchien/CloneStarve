@@ -10,10 +10,12 @@ export default class Player {
     this.state = "idle";
     this.speed = 200;
     this.cursors = scene.input.keyboard.createCursorKeys();
+    
   }
 
   update(delta) {
     this.movement(delta);
+    this.rotateTowardsMouse();
   }
 
   movement(delta) {
@@ -42,6 +44,16 @@ export default class Player {
     } else {
       this.state = "idle";
     }
+  }
+  rotateTowardsMouse() {
+    const pointer = this.scene.input.activePointer; 
+    const angle = Phaser.Math.Angle.Between(
+      this.sprite.x+this.sprite.displayWidth/2,
+      this.sprite.y,
+      pointer.x,
+      pointer.y
+    );
+    this.sprite.setRotation(angle-90); 
   }
 
   takeDamage(amount) {
