@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES6",                    // Sử dụng ES6
+    "module": "ESNext",                 // Hỗ trợ ES Modules
+    "strict": true,                     // Kiểm tra kiểu chặt chẽ
+    "outDir": "./dist",                 // Thư mục chứa file JS sau khi biên dịch
+    "rootDir": "./src",                 // Thư mục chứa mã nguồn TypeScript
+    "esModuleInterop": true,            // Hỗ trợ import module dạng ES6
+    "moduleResolution": "node",         // Hỗ trợ module từ Node.js
+    "sourceMap": true                   // Tạo source map để debug
+  },
+  "include": ["src/**/*"],              // Bao gồm tất cả file trong src
+  "exclude": ["node_modules"]           // Loại trừ thư mục node_modules
+}

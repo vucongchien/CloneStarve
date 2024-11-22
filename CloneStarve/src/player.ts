@@ -1,7 +1,15 @@
 import Phaser from "phaser";
 
 export default class Player {
-  constructor(scene, x, y, texture) {
+  private scene: Phaser.Scene;
+  private sprite: Phaser.GameObjects.Sprite;
+  private hp: number;
+  private maxHp: number;
+  private state: string;
+  private speed: number;
+  private cursors: Phaser.Types.Input.Keyboard.CursorKeys;
+
+  constructor(scene: Phaser.Scene, x: number, y: number, texture: string) {
     this.scene = scene;
     this.sprite = scene.add.sprite(x, y, texture).setOrigin(0.5, 0.5);
 
@@ -9,29 +17,29 @@ export default class Player {
     this.maxHp = 100;
     this.state = "idle";
     this.speed = 200;
-    this.cursors = scene.input.keyboard.createCursorKeys();
-    
+    this.cursors = (scene.input.keyboard as Phaser.Input.Keyboard.KeyboardPlugin).createCursorKeys();
+  
   }
 
-  update(delta) {
+  update(delta: number) {
     this.movement(delta);
     this.rotateTowardsMouse();
   }
 
-  movement(delta) {
+  private movement(delta: number) {
     let velocityX = 0;
     let velocityY = 0;
 
-    if (this.cursors.left.isDown) {
+    if (this.cursors.left?.isDown) {
       velocityX = -this.speed;
       this.heal(10);
-    } else if (this.cursors.right.isDown) {
+    } else if (this.cursors.right?.isDown) {
       velocityX = this.speed;
     }
 
-    if (this.cursors.up.isDown) {
+    if (this.cursors.up?.isDown) {
       velocityY = -this.speed;
-    } else if (this.cursors.down.isDown) {
+    } else if (this.cursors.down?.isDown) {
       velocityY = this.speed;
       this.takeDamage(10);
     }
@@ -39,27 +47,18 @@ export default class Player {
     this.sprite.x += velocityX * delta;
     this.sprite.y += velocityY * delta;
 
-    if (velocityX !== 0 || velocityY !== 0) {
-      this.state = "moving";
-    } else {
-      this.state = "idle";
-    }
-  }
-  rotateTowardsMouse() {
-    const pointer = this.scene.input.activePointer; 
-    const angle = Phaser.Math.Angle.Between(
-      this.sprite.x+this.sprite.displayWidth/2,
-      this.sprite.y,
-      pointer.x,
-      pointer.y
-    );
-    this.sprite.setRotation(angle-90); 
+    this.state = velocityX !== 0 || velocityY !== 0 ? "moving" : "idle";
   }
 
-  takeDamage(amount) {
-    this.hp -= amount;
-    if (this.hp <= 0) {
-      this.hp = 0;
+  private rotateTowardsMouse() {
+    const pointer = this.scene.input.activePointer;
+    const angle = Phaser.Math.Angle.Between(this.sprite.x, this.sprite.y, pointer.x, pointer.y);
+    this.sprite.setRotation(angle); 
+  }
+
+  private takeDamage(amount: number) {
+    this.hp = Math.max(this.hp - amount, 0);
+    if (this.hp === 0) {
       this.state = "dead";
       console.log("Player is dead!");
     }
@@ -77,11 +76,8 @@ export default class Player {
     });
   }
 
-  heal(amount) {
-    this.hp += amount;
-    if (this.hp > this.maxHp) {
-      this.hp = this.maxHp;
-    }
+  private heal(amount: number) {
+    this.hp = Math.min(this.hp + amount, this.maxHp);
 
     this.sprite.setTint(0x00ff00);
     this.scene.tweens.add({
